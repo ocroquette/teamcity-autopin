@@ -34,6 +34,7 @@ The easiest way to pin builds automatically is to add the build feature "Pin the
   * Set comment
   * Optional tag
 
+All filters must match for the pinning to occur, but you can add the build feature multiple times with different settings if required.
 
 ### Pinning using system messages
 
@@ -60,6 +61,7 @@ The plugin makes it also easy to add build tags automatically. Just  add the bui
 * Other options:
   * Tag also build dependencies
 
+All filters must match for the tagging to occur, but you can add the build feature multiple times with different settings if required.
 
 ### Tagging using system messages
 
