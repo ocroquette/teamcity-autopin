@@ -1,6 +1,10 @@
 # Autopin plugin for Teamcity
 
-This plugin allows to pin and tag Teamcity builds automatically, e.g. without human interaction.
+This plugin allows to pin and/or tag Teamcity builds automatically, e.g. without human interaction. Here are some use cases:
+
+* pin automatically a build run on a release branch
+* tag the build with the version string generated in a build step
+* when a build is parameterized, add a tag automatically accordingly, to see and filter easily the builds run with a given parameter value
 
 ## Warning
 
