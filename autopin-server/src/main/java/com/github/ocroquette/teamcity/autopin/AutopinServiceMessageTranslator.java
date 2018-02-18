@@ -4,6 +4,8 @@ import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.messages.BuildMessage1;
 import jetbrains.buildServer.messages.serviceMessages.ServiceMessage;
 import jetbrains.buildServer.messages.serviceMessages.ServiceMessageTranslator;
+import jetbrains.buildServer.serverSide.BuildHistory;
+import jetbrains.buildServer.serverSide.BuildPromotion;
 import jetbrains.buildServer.serverSide.SProject;
 import jetbrains.buildServer.serverSide.SRunningBuild;
 import jetbrains.buildServer.users.User;
@@ -18,9 +20,13 @@ import java.util.Map;
 public class AutopinServiceMessageTranslator implements ServiceMessageTranslator {
     private final Logger LOG = Logger.getLogger(Loggers.SERVER_CATEGORY);
 
-    public AutopinServiceMessageTranslator() {
-        LOG.info("AutopinServiceMessageTranslator constructor");
-        Loggers.SERVER.info("AutopinServiceMessageTranslator constructor");
+    private final BuildHistory buildHistory;
+
+    private final String ATTRIBUTE_TAG = "tag";
+    private final String ATTRIBUTE_INCLUDE_DEPENDENCIES = "includeDependencies";
+
+    public AutopinServiceMessageTranslator(@NotNull BuildHistory buildHistory) {
+        this.buildHistory = buildHistory;
     }
 
 
@@ -31,18 +37,36 @@ public class AutopinServiceMessageTranslator implements ServiceMessageTranslator
 
     @NotNull
     public List<BuildMessage1> translate(SRunningBuild build, BuildMessage1 originalMessage, ServiceMessage serviceMessage) {
-        SProject project = build.getBuildType().getProject();
-        long myId = build.getBuildId();
-        User myUser = build.getTriggeredBy().getUser();
-        LOG.info("AutopinServiceMessageTranslator: " + myId + ": ServiceMessageTranslator received message: " + serviceMessage);
-        for (Map.Entry<String, String> entry: serviceMessage.getAttributes().entrySet() ) {
-            LOG.info("AutopinServiceMessageTranslator: " + myId + ": ServiceMessageTranslator received message: " + entry.getKey() + "=" + entry.getValue());
-        }
+        String tag = getTag(serviceMessage);
+        boolean includeDependencies = getIncludeDependencies(serviceMessage);
 
-        BuildTagHelper.addTag(build, serviceMessage.getArgument());
+        if (tag.isEmpty()) {
+            LOG.warn("No tag provided for " + getServiceMessageName() + " in build " + build.getBuildId());
+        } else {
+            BuildTagHelper.addTag(build, tag);
+            if (includeDependencies) {
+                for (BuildPromotion bp : build.getBuildPromotion().getAllDependencies()) {
+                    BuildTagHelper.addTag(buildHistory.findEntry(bp.getAssociatedBuild().getBuildId()), tag);
+                }
+            }
+        }
 
         List<BuildMessage1> buildMessages = new ArrayList<BuildMessage1>();
         buildMessages.add(originalMessage);
         return buildMessages;
+    }
+
+    private String getTag(ServiceMessage serviceMessage) {
+        if (serviceMessage.getArgument() != null && !serviceMessage.getArgument().isEmpty()) {
+            return serviceMessage.getArgument();
+        } else if (serviceMessage.getAttributes().get(ATTRIBUTE_TAG) != null && !serviceMessage.getAttributes().get(ATTRIBUTE_TAG).isEmpty()) {
+            return serviceMessage.getAttributes().get(ATTRIBUTE_TAG);
+        } else {
+            return "";
+        }
+    }
+
+    private boolean getIncludeDependencies(ServiceMessage serviceMessage) {
+        return StringUtils.isTrue(serviceMessage.getAttributes().get(ATTRIBUTE_INCLUDE_DEPENDENCIES));
     }
 }

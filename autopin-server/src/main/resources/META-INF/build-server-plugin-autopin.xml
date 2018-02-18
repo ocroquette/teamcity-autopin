@@ -5,4 +5,5 @@
        default-autowire="constructor">
     <bean class="com.github.ocroquette.teamcity.autopin.AutopinBuildServerListener"></bean>
     <bean class="com.github.ocroquette.teamcity.autopin.AutopinServiceMessageTranslator"></bean>
+    <bean class="com.github.ocroquette.teamcity.autopin.AutoPinBuildFeature"></bean>
 </beans>

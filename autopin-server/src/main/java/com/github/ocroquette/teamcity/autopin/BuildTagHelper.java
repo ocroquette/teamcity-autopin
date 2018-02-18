@@ -1,5 +1,6 @@
 package com.github.ocroquette.teamcity.autopin;
 
+import jetbrains.buildServer.serverSide.BuildPromotion;
 import jetbrains.buildServer.serverSide.SBuild;
 
 import java.util.ArrayList;

@@ -18,9 +18,38 @@ Then copy the ZIP file ```target/autopin.zip``` in the plugins directory of your
 
 ## Usage
 
-Currently, the plugin uses system messages, also known as [build script interaction](https://confluence.jetbrains.com/display/TCD10/Build+Script+Interaction+with+TeamCity).
+### Pinning using build features
 
-To add a build tag to the running build, use:
+The easiest way to pin builds automatically is to add the build feature "Pin build" provided by the plugin. It has the following parameters:
+
+* Filters:
+ * On status (successful or failed builds)
+ * On branch name
+* Other options:
+ * Pin also build dependencies
+ * Set comment
+ * Optional tag
+
+
+### Pinning using system messages
+
+It is also possible to pin the build based on system messages, also known as [build script interaction](https://confluence.jetbrains.com/display/TCD10/Build+Script+Interaction+with+TeamCity).
+
+Since Teamcity doesn't allow to pin a running build directly, a special build tag is set for the build, which is processed and removed once the build finished.
+
+```
+##teamcity[addBuildTag 'autopin']
+```
+
+You can also request to pin the dependencies:
+
+```
+##teamcity[addBuildTag 'autopin_include_dependencies']
+```
+
+
+
+### Tagging using system messages
 
 
 ```
@@ -30,24 +59,11 @@ To add a build tag to the running build, use:
 To add the build tag ```some_tag``` to the running build and all its dependencies, use:
 
 ```
-echo "##teamcity[addBuildTag 'tc_autotag_with_dependencies_some_tag']"
-```
-
-The tag ```tc_autotag_with_dependencies_some_tag``` will be added immediatly, and processed by the plugin once the build finishes.
-
-To pin a build automaticy once it finishes, add the following special tag:
-
-```
-echo "##teamcity[addBuildTag 'tc_autopin']"
-```
-
-And to pin also the depending builds:
-
-```
-echo "##teamcity[addBuildTag 'tc_autopin_with_dependencies']"
+##teamcity[addBuildTag tag='some_tag' includeDependencies='true']"
 ```
 
 ## TODO
 
-* Introduce build features to autotag and autopin
+* Introduce specific service messages for pinning request
+* Introduce build feature for tagging
 
