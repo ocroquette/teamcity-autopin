@@ -6,33 +6,31 @@ import jetbrains.buildServer.messages.serviceMessages.ServiceMessage;
 import jetbrains.buildServer.messages.serviceMessages.ServiceMessageTranslator;
 import jetbrains.buildServer.serverSide.BuildHistory;
 import jetbrains.buildServer.serverSide.BuildPromotion;
-import jetbrains.buildServer.serverSide.SProject;
 import jetbrains.buildServer.serverSide.SRunningBuild;
-import jetbrains.buildServer.users.User;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 
-public class AutopinServiceMessageTranslator implements ServiceMessageTranslator {
+public class AddBuildTagMessageTranslator implements ServiceMessageTranslator {
     private final Logger LOG = Logger.getLogger(Loggers.SERVER_CATEGORY);
 
     private final BuildHistory buildHistory;
 
-    private final String ATTRIBUTE_TAG = "tag";
-    private final String ATTRIBUTE_INCLUDE_DEPENDENCIES = "includeDependencies";
+    private static final String SM_NAME = "addBuildTag";
+    private static final String ATTRIBUTE_TAG = "tag";
+    private static final String ATTRIBUTE_INCLUDE_DEPENDENCIES = "includeDependencies";
 
-    public AutopinServiceMessageTranslator(@NotNull BuildHistory buildHistory) {
+    public AddBuildTagMessageTranslator(@NotNull BuildHistory buildHistory) {
         this.buildHistory = buildHistory;
     }
 
 
     @NotNull
     public String getServiceMessageName() {
-        return "addBuildTag";
+        return SM_NAME;
     }
 
     @NotNull

@@ -35,17 +35,17 @@ The easiest way to pin builds automatically is to add the build feature "Pin the
 
 It is also possible to pin the build based on system messages, also known as [build script interaction](https://confluence.jetbrains.com/display/TCD10/Build+Script+Interaction+with+TeamCity).
 
-Since Teamcity doesn't allow to pin a running build directly, a special build tag is set for the build, which is processed and removed once the build finished.
-
 ```
-##teamcity[addBuildTag 'autopin']
+##teamcity[requestPinning]
 ```
 
 You can also request to pin the dependencies:
 
 ```
-##teamcity[addBuildTag 'autopin_include_dependencies']
+##teamcity[requestPinning includeDependencies='true']
 ```
+
+Since Teamcity doesn't allow to pin a running build, a special build tag is set for the build, which is processed and removed once the build is finished.
 
 ### Tagging using build features
 
@@ -71,7 +71,4 @@ To add the build tag ```some_tag``` to the running build and all its dependencie
 ##teamcity[addBuildTag tag='some_tag' includeDependencies='true']"
 ```
 
-## TODO
-
-* Introduce specific service messages for pinning request
 

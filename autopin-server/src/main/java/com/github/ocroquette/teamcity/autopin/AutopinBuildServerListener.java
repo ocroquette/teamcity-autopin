@@ -11,10 +11,11 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.Map;
 
+import static com.github.ocroquette.teamcity.autopin.RequestPinningMessageTranslator.TAG_REQUEST_PINNING;
+import static com.github.ocroquette.teamcity.autopin.RequestPinningMessageTranslator.TAG_REQUEST_PINNING_INCLUDE_DEPENDENCIES;
+
 
 public class AutopinBuildServerListener extends BuildServerAdapter {
-    public static final String TAG_PIN = "autopin";
-    public static final String TAG_PIN_INCLUDE_DEPENDENCIES = "autopin_include_dependencies";
 
     private final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(Loggers.SERVER_CATEGORY);
     private final BuildHistory buildHistory;
@@ -53,13 +54,13 @@ public class AutopinBuildServerListener extends BuildServerAdapter {
 
         User triggeringUser = build.getTriggeredBy().getUser();
 
-        if (finishedBuild.getTags().contains(TAG_PIN) || finishedBuild.getTags().contains(TAG_PIN_INCLUDE_DEPENDENCIES)) {
+        if (finishedBuild.getTags().contains(TAG_REQUEST_PINNING) || finishedBuild.getTags().contains(TAG_REQUEST_PINNING_INCLUDE_DEPENDENCIES)) {
 
-            String comment = "Pinned automatically based on service message (" + TAG_PIN + ") in build #" + finishedBuild.getBuildId();
+            String comment = "Pinned automatically based on service message in build #" + finishedBuild.getBuildId();
 
             finishedBuild.setPinned(true, triggeringUser, comment);
 
-            if (finishedBuild.getTags().contains(TAG_PIN_INCLUDE_DEPENDENCIES)) {
+            if (finishedBuild.getTags().contains(TAG_REQUEST_PINNING_INCLUDE_DEPENDENCIES)) {
                 List<? extends BuildPromotion> allDependencies = finishedBuild.getBuildPromotion().getAllDependencies();
 
                 for (BuildPromotion bp : allDependencies) {
@@ -68,8 +69,8 @@ public class AutopinBuildServerListener extends BuildServerAdapter {
                 }
             }
 
-            BuildTagHelper.removeTag(finishedBuild, TAG_PIN);
-            BuildTagHelper.removeTag(finishedBuild, TAG_PIN_INCLUDE_DEPENDENCIES);
+            BuildTagHelper.removeTag(finishedBuild, TAG_REQUEST_PINNING);
+            BuildTagHelper.removeTag(finishedBuild, TAG_REQUEST_PINNING_INCLUDE_DEPENDENCIES);
         }
 
         for (SBuildFeatureDescriptor bfd : finishedBuild.getBuildFeaturesOfType(AutoPinBuildFeature.TYPE)) {
@@ -86,10 +87,10 @@ public class AutopinBuildServerListener extends BuildServerAdapter {
         }
     }
 
-    private boolean arePinningConditionsMet(Map<String, String> buildFeatureParameters, SBuild build) {
+    private boolean arePinningConditionsMet(Map<String, String> parameters, SBuild build) {
         boolean matching = true;
 
-        String requestedStatus = buildFeatureParameters.get(AutoPinBuildFeature.PARAM_STATUS);
+        String requestedStatus = parameters.get(AutoPinBuildFeature.PARAM_STATUS);
         if (requestedStatus != null) {
             if (requestedStatus.equals(AutoPinBuildFeature.PARAM_STATUS_SUCCESSFUL)) {
                 matching = matching && build.getBuildStatus().equals(Status.NORMAL);
@@ -98,7 +99,7 @@ public class AutopinBuildServerListener extends BuildServerAdapter {
             }
         }
 
-        String requestedBranchPattern = buildFeatureParameters.get(AutoPinBuildFeature.PARAM_BRANCH_PATTERN);
+        String requestedBranchPattern = parameters.get(AutoPinBuildFeature.PARAM_BRANCH_PATTERN);
         if (requestedBranchPattern != null && !requestedBranchPattern.isEmpty()) {
             matching = matching && build.getBranch().getName().matches(requestedBranchPattern);
         }
@@ -106,10 +107,10 @@ public class AutopinBuildServerListener extends BuildServerAdapter {
         return matching;
     }
 
-    private boolean areTaggingConditionsMet(Map<String, String> buildFeatureParameters, SBuild build) {
+    private boolean areTaggingConditionsMet(Map<String, String> parameters, SBuild build) {
         boolean matching = true;
 
-        String requestedBranchPattern = buildFeatureParameters.get(AutoPinBuildFeature.PARAM_BRANCH_PATTERN);
+        String requestedBranchPattern = parameters.get(AutoPinBuildFeature.PARAM_BRANCH_PATTERN);
         if (requestedBranchPattern != null && !requestedBranchPattern.isEmpty()) {
             matching = matching && build.getBranch().getName().matches(requestedBranchPattern);
         }
