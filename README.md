@@ -23,7 +23,7 @@ Then copy the ZIP file ```target/autopin.zip``` in the plugins directory of your
 The easiest way to pin builds automatically is to add the build feature "Pin build" provided by the plugin. It has the following parameters:
 
 * Filters:
-  * On status (successful or failed builds)
+  * On status (successful, failed or any)
   * On branch name
 * Other options:
   * Pin also build dependencies
