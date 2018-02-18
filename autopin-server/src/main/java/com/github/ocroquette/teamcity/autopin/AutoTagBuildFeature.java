@@ -85,6 +85,7 @@ public class AutoTagBuildFeature extends BuildFeature {
         return new PropertiesProcessor() {
             public Collection<InvalidProperty> process(Map<String, String> params) {
                 List<InvalidProperty> errors = new ArrayList<InvalidProperty>();
+                errors.add(new InvalidProperty(PARAM_TAG, "Tag must be provided"));
                 return errors;
             }
         };
@@ -94,7 +95,7 @@ public class AutoTagBuildFeature extends BuildFeature {
     public Map<String, String> getDefaultParameters() {
         final HashMap<String, String> map = new HashMap<String, String>();
         map.put(PARAM_BRANCH_PATTERN, "");
-        map.put(PARAM_TAG, "UNDEFINED-TAG");
+        map.put(PARAM_TAG, "");
         map.put(PARAM_TAG_DEPENDENCIES, "true");
         return map;
     }

@@ -14,6 +14,7 @@
     <th>Branch must match</th>
     <td>
       <props:textProperty name="branch_pattern"/>
+      <span class="smallNote">(optional) Java regular expression that the complete branch name must match</span>
     </td>
   </tr>
 </l:settingsGroup>
@@ -22,6 +23,7 @@
     <th>Pin dependencies</th>
     <td>
       <props:checkboxProperty name="pin_dependencies" uncheckedValue="false"/>
+      <span class="smallNote">If checked, all build dependencies will be pinned too</span>
     </td>
   </tr>
   <tr>
