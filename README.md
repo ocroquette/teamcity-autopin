@@ -51,6 +51,7 @@ You can also request to pin the dependencies:
 
 ### Tagging using system messages
 
+To add the build tag ```some_tag``` to the running build, use:
 
 ```
 ##teamcity[addBuildTag 'some_tag']
