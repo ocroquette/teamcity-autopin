@@ -23,7 +23,6 @@ public class AutopinBuildServerListener extends BuildServerAdapter {
 
     public AutopinBuildServerListener(@NotNull EventDispatcher<BuildServerListener> events,
                                       @NotNull BuildHistory buildHistory) {
-        LOG.info("AutopinBuildServerListener constructor");
         events.addListener(this);
         this.buildHistory = buildHistory;
     }
@@ -48,13 +47,6 @@ public class AutopinBuildServerListener extends BuildServerAdapter {
 
     @Override
     public void buildFinished(@NotNull SRunningBuild build) {
-        Loggers.SERVER.info("buildFinished: " + LogUtil.describe(build));
-        Loggers.SERVER.info("buildFinished: branch=" + build.getBranch());
-        if ( build.getBranch() != null ) {
-            Loggers.SERVER.info("buildFinished: branch name=" + build.getBranch().getName());
-            Loggers.SERVER.info("buildFinished: branch displayName=" + build.getBranch().getDisplayName());
-        }
-
         final SFinishedBuild finishedBuild = buildHistory.findEntry(build.getBuildId());
 
         User triggeringUser = build.getTriggeredBy().getUser();
@@ -69,7 +61,6 @@ public class AutopinBuildServerListener extends BuildServerAdapter {
                 List<? extends BuildPromotion> allDependencies = finishedBuild.getBuildPromotion().getAllDependencies();
 
                 for (BuildPromotion bp : allDependencies) {
-                    LOG.info("Pinning dependency: " + bp.getAssociatedBuild());
                     buildHistory.findEntry(bp.getAssociatedBuild().getBuildId()).setPinned(true, triggeringUser, comment);
                 }
             }
