@@ -9,25 +9,19 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class AutoPinBuildFeature extends BuildFeature {
+public class AutoTagBuildFeature extends BuildFeature {
 
-    public static final String TYPE = AutoPinBuildFeature.class.getName();
-
-    public static final String PARAM_STATUS = "status_radio";
-    public static final String PARAM_STATUS_SUCCESSFUL = "Successful";
-    public static final String PARAM_STATUS_FAILED = "Failed";
-    public static final String PARAM_STATUS_ANY = "Any";
+    public static final String TYPE = AutoTagBuildFeature.class.getName();
 
     public static final String PARAM_BRANCH_PATTERN = "branch_pattern";
-    public static final String PARAM_COMMENT = "comment";
     public static final String PARAM_TAG = "tag";
-    public static final String PARAM_PIN_DEPENDENCIES = "pin_dependencies";
+    public static final String PARAM_TAG_DEPENDENCIES = "tag_dependencies";
 
 
     private final String myEditUrl;
 
-    public AutoPinBuildFeature(@NotNull final PluginDescriptor descriptor) {
-        myEditUrl = descriptor.getPluginResourcesPath("autopinBuildFeatureSettings.jsp");
+    public AutoTagBuildFeature(@NotNull final PluginDescriptor descriptor) {
+        myEditUrl = descriptor.getPluginResourcesPath("autotagBuildFeatureSettings.jsp");
     }
 
 
@@ -40,7 +34,7 @@ public class AutoPinBuildFeature extends BuildFeature {
     @NotNull
     @Override
     public String getDisplayName() {
-        return "Pin the build";
+        return "Tag the build";
     }
 
     @Nullable
@@ -59,26 +53,15 @@ public class AutoPinBuildFeature extends BuildFeature {
     public String describeParameters(@NotNull Map<String, String> params) {
         StringBuilder sb = new StringBuilder();
 
-        sb.append("Pin");
+        sb.append("Tag build");
 
-        if ( getParameterWithDefaults(params, PARAM_STATUS).equals(PARAM_STATUS_SUCCESSFUL))
-            sb.append(" successfull");
-        else if ( getParameterWithDefaults(params, PARAM_STATUS).equals(PARAM_STATUS_FAILED))
-            sb.append(" failed");
-
-        sb.append(" build");
-
-        if (StringUtils.isTrue(getParameterWithDefaults(params, PARAM_PIN_DEPENDENCIES)))
+        if (StringUtils.isTrue(getParameterWithDefaults(params, PARAM_TAG_DEPENDENCIES)))
             sb.append(" and all its dependencies");
+
+        sb.append(" with \"" + getParameterWithDefaults(params, PARAM_TAG) + "\"");
 
         if (!getParameterWithDefaults(params, PARAM_BRANCH_PATTERN).isEmpty())
             sb.append(" if branch matches \"" + getParameterWithDefaults(params, PARAM_BRANCH_PATTERN) + "\"");
-
-        if (!getParameterWithDefaults(params, PARAM_COMMENT).isEmpty())
-            sb.append(" with comment \"" + getParameterWithDefaults(params, PARAM_COMMENT) + "\"");
-
-        if (!getParameterWithDefaults(params, PARAM_TAG).isEmpty())
-            sb.append(" and add tag \"" + getParameterWithDefaults(params, PARAM_TAG) + "\"");
 
         return sb.toString();
     }
@@ -110,11 +93,9 @@ public class AutoPinBuildFeature extends BuildFeature {
     @Override
     public Map<String, String> getDefaultParameters() {
         final HashMap<String, String> map = new HashMap<String, String>();
-        map.put(PARAM_STATUS, "Successful");
         map.put(PARAM_BRANCH_PATTERN, "");
-        map.put(PARAM_COMMENT, "Pinned automatically");
-        map.put(PARAM_TAG, "");
-        map.put(PARAM_PIN_DEPENDENCIES, "true");
+        map.put(PARAM_TAG, "UNDEFINED-TAG");
+        map.put(PARAM_TAG_DEPENDENCIES, "true");
         return map;
     }
 }

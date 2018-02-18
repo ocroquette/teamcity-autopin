@@ -28,6 +28,24 @@ public class AutopinBuildServerListener extends BuildServerAdapter {
     }
 
     @Override
+    public void buildStarted(@NotNull SRunningBuild runningBuild) {
+        User triggeringUser = runningBuild.getTriggeredBy().getUser();
+        for (SBuildFeatureDescriptor bfd : runningBuild.getBuildFeaturesOfType(AutoTagBuildFeature.TYPE)) {
+            String tag = bfd.getParameters().get(AutoTagBuildFeature.PARAM_TAG);
+
+            if (areTaggingConditionsMet(bfd.getParameters(), runningBuild)) {
+                BuildTagHelper.addTag(runningBuild, tag);
+
+                if (StringUtils.isTrue(bfd.getParameters().get(AutoTagBuildFeature.PARAM_TAG_DEPENDENCIES))) {
+                    for (BuildPromotion bp : runningBuild.getBuildPromotion().getAllDependencies()) {
+                        BuildTagHelper.addTag(buildHistory.findEntry(bp.getAssociatedBuild().getBuildId()), tag);
+                    }
+                }
+            }
+        }
+    }
+
+        @Override
     public void buildFinished(@NotNull SRunningBuild build) {
         Loggers.SERVER.info("buildFinished: " + LogUtil.describe(build));
 
@@ -55,7 +73,7 @@ public class AutopinBuildServerListener extends BuildServerAdapter {
         }
 
         for (SBuildFeatureDescriptor bfd : finishedBuild.getBuildFeaturesOfType(AutoPinBuildFeature.TYPE)) {
-            if (areConditionsMet(bfd.getParameters(), finishedBuild)) {
+            if (arePinningConditionsMet(bfd.getParameters(), finishedBuild)) {
                 String comment = bfd.getParameters().get(AutoPinBuildFeature.PARAM_COMMENT);
                 finishedBuild.setPinned(true, triggeringUser, comment);
 
@@ -68,7 +86,7 @@ public class AutopinBuildServerListener extends BuildServerAdapter {
         }
     }
 
-    private boolean areConditionsMet(Map<String, String> buildFeatureParameters, SFinishedBuild build) {
+    private boolean arePinningConditionsMet(Map<String, String> buildFeatureParameters, SBuild build) {
         boolean matching = true;
 
         String requestedStatus = buildFeatureParameters.get(AutoPinBuildFeature.PARAM_STATUS);
@@ -79,6 +97,17 @@ public class AutopinBuildServerListener extends BuildServerAdapter {
                 matching = matching && !build.getBuildStatus().equals(Status.NORMAL);
             }
         }
+
+        String requestedBranchPattern = buildFeatureParameters.get(AutoPinBuildFeature.PARAM_BRANCH_PATTERN);
+        if (requestedBranchPattern != null && !requestedBranchPattern.isEmpty()) {
+            matching = matching && build.getBranch().getName().matches(requestedBranchPattern);
+        }
+
+        return matching;
+    }
+
+    private boolean areTaggingConditionsMet(Map<String, String> buildFeatureParameters, SBuild build) {
+        boolean matching = true;
 
         String requestedBranchPattern = buildFeatureParameters.get(AutoPinBuildFeature.PARAM_BRANCH_PATTERN);
         if (requestedBranchPattern != null && !requestedBranchPattern.isEmpty()) {

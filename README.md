@@ -20,7 +20,7 @@ Then copy the ZIP file ```target/autopin.zip``` in the plugins directory of your
 
 ### Pinning using build features
 
-The easiest way to pin builds automatically is to add the build feature "Pin build" provided by the plugin. It has the following parameters:
+The easiest way to pin builds automatically is to add the build feature "Pin the build" provided by the plugin. It has the following parameters:
 
 * Filters:
   * On status (successful, failed or any)
@@ -47,6 +47,14 @@ You can also request to pin the dependencies:
 ##teamcity[addBuildTag 'autopin_include_dependencies']
 ```
 
+### Tagging using build features
+
+The plugin makes it also easy to add build tags automatically. Just  add the build feature "Tag the build" provided by the plugin. It has the following parameters:
+
+* Filters:
+  * On branch name
+* Other options:
+  * Tag also build dependencies
 
 
 ### Tagging using system messages
@@ -66,5 +74,4 @@ To add the build tag ```some_tag``` to the running build and all its dependencie
 ## TODO
 
 * Introduce specific service messages for pinning request
-* Introduce build feature for tagging
 
