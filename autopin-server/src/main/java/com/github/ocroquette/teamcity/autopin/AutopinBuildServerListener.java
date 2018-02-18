@@ -46,9 +46,14 @@ public class AutopinBuildServerListener extends BuildServerAdapter {
         }
     }
 
-        @Override
+    @Override
     public void buildFinished(@NotNull SRunningBuild build) {
         Loggers.SERVER.info("buildFinished: " + LogUtil.describe(build));
+        Loggers.SERVER.info("buildFinished: branch=" + build.getBranch());
+        if ( build.getBranch() != null ) {
+            Loggers.SERVER.info("buildFinished: branch name=" + build.getBranch().getName());
+            Loggers.SERVER.info("buildFinished: branch displayName=" + build.getBranch().getDisplayName());
+        }
 
         final SFinishedBuild finishedBuild = buildHistory.findEntry(build.getBuildId());
 
@@ -100,8 +105,8 @@ public class AutopinBuildServerListener extends BuildServerAdapter {
         }
 
         String requestedBranchPattern = parameters.get(AutoPinBuildFeature.PARAM_BRANCH_PATTERN);
-        if (requestedBranchPattern != null && !requestedBranchPattern.isEmpty()) {
-            matching = matching && build.getBranch().getName().matches(requestedBranchPattern);
+        if (requestedBranchPattern != null && !requestedBranchPattern.isEmpty() && build.getBranch() != null) {
+            matching = matching && build.getBranch().getDisplayName().matches(requestedBranchPattern);
         }
 
         return matching;
@@ -111,8 +116,8 @@ public class AutopinBuildServerListener extends BuildServerAdapter {
         boolean matching = true;
 
         String requestedBranchPattern = parameters.get(AutoPinBuildFeature.PARAM_BRANCH_PATTERN);
-        if (requestedBranchPattern != null && !requestedBranchPattern.isEmpty()) {
-            matching = matching && build.getBranch().getName().matches(requestedBranchPattern);
+        if (requestedBranchPattern != null && !requestedBranchPattern.isEmpty()  && build.getBranch() != null) {
+            matching = matching && build.getBranch().getDisplayName().matches(requestedBranchPattern);
         }
 
         return matching;

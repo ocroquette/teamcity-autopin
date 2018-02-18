@@ -28,7 +28,7 @@ The easiest way to pin builds automatically is to add the build feature "Pin the
 
 * Filters:
   * On status (successful, failed or any)
-  * On branch name
+  * On branch name (see FAQ below)
 * Other options:
   * Pin also build dependencies
   * Set comment
@@ -56,7 +56,7 @@ Since Teamcity doesn't allow to pin a running build, a special build tag is set 
 The plugin makes it also easy to add build tags automatically. Just  add the build feature "Tag the build" provided by the plugin. It has the following parameters:
 
 * Filters:
-  * On branch name
+  * On branch name (see FAQ below)
 * Other options:
   * Tag also build dependencies
 
@@ -75,4 +75,29 @@ To add the build tag ```some_tag``` to the running build and all its dependencie
 ##teamcity[addBuildTag tag='some_tag' includeDependencies='true']"
 ```
 
+
+## FAQ
+### My branch filter doesn't work. Why?
+
+The branch filter is a regular expression that must match the complete branch name as displayed in the web interface. So if you want to match:
+
+```
+refs/heads/master
+```
+
+you will need the following regular expression:
+
+```
+refs/heads/master
+```
+
+It is not necessary to escape the slashes.
+
+If you need to match release branches only, use:
+
+```
+refs/heads/release/.*
+```
+
+On a side note, you can use parenthesis in the branch definition of the VCS roots to get rid of the annoying prefix ```refs/heads``` when using Git.
 
