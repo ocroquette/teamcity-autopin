@@ -1,13 +1,17 @@
 package com.github.ocroquette.teamcity.autopin;
 
+import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.serverSide.BuildFeature;
 import jetbrains.buildServer.serverSide.InvalidProperty;
 import jetbrains.buildServer.serverSide.PropertiesProcessor;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
+import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+
+import static com.github.ocroquette.teamcity.autopin.StringUtils.isSet;
 
 public class AutoTagBuildFeature extends BuildFeature {
 
@@ -17,6 +21,7 @@ public class AutoTagBuildFeature extends BuildFeature {
     public static final String PARAM_TAG = "tag";
     public static final String PARAM_TAG_DEPENDENCIES = "tag_dependencies";
 
+    private final Logger LOG = Logger.getLogger(Loggers.SERVER_CATEGORY);
 
     private final String myEditUrl;
 
@@ -85,7 +90,8 @@ public class AutoTagBuildFeature extends BuildFeature {
         return new PropertiesProcessor() {
             public Collection<InvalidProperty> process(Map<String, String> params) {
                 List<InvalidProperty> errors = new ArrayList<InvalidProperty>();
-                errors.add(new InvalidProperty(PARAM_TAG, "Tag must be provided"));
+                if (!isSet(params.get(PARAM_TAG)))
+                    errors.add(new InvalidProperty(PARAM_TAG, "Tag must be provided"));
                 return errors;
             }
         };

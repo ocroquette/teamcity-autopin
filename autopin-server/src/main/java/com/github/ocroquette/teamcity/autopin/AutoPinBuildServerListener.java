@@ -15,13 +15,13 @@ import static com.github.ocroquette.teamcity.autopin.RequestPinningMessageTransl
 import static com.github.ocroquette.teamcity.autopin.RequestPinningMessageTranslator.TAG_REQUEST_PINNING_INCLUDE_DEPENDENCIES;
 
 
-public class AutopinBuildServerListener extends BuildServerAdapter {
+public class AutoPinBuildServerListener extends BuildServerAdapter {
 
     private final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(Loggers.SERVER_CATEGORY);
     private final BuildHistory buildHistory;
 
 
-    public AutopinBuildServerListener(@NotNull EventDispatcher<BuildServerListener> events,
+    public AutoPinBuildServerListener(@NotNull EventDispatcher<BuildServerListener> events,
                                       @NotNull BuildHistory buildHistory) {
         events.addListener(this);
         this.buildHistory = buildHistory;
