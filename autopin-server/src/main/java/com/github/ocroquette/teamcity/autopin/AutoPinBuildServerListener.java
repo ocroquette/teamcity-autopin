@@ -3,7 +3,6 @@ package com.github.ocroquette.teamcity.autopin;
 import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.messages.Status;
 import jetbrains.buildServer.serverSide.*;
-import jetbrains.buildServer.serverSide.impl.LogUtil;
 import jetbrains.buildServer.users.User;
 import jetbrains.buildServer.util.EventDispatcher;
 import org.jetbrains.annotations.NotNull;
@@ -25,24 +24,6 @@ public class AutoPinBuildServerListener extends BuildServerAdapter {
                                       @NotNull BuildHistory buildHistory) {
         events.addListener(this);
         this.buildHistory = buildHistory;
-    }
-
-    @Override
-    public void buildStarted(@NotNull SRunningBuild runningBuild) {
-        User triggeringUser = runningBuild.getTriggeredBy().getUser();
-        for (SBuildFeatureDescriptor bfd : runningBuild.getBuildFeaturesOfType(AutoTagBuildFeature.TYPE)) {
-            String tag = bfd.getParameters().get(AutoTagBuildFeature.PARAM_TAG);
-
-            if (areTaggingConditionsMet(bfd.getParameters(), runningBuild)) {
-                BuildTagHelper.addTag(runningBuild, tag);
-
-                if (StringUtils.isTrue(bfd.getParameters().get(AutoTagBuildFeature.PARAM_TAG_DEPENDENCIES))) {
-                    for (BuildPromotion bp : runningBuild.getBuildPromotion().getAllDependencies()) {
-                        BuildTagHelper.addTag(buildHistory.findEntry(bp.getAssociatedBuild().getBuildId()), tag);
-                    }
-                }
-            }
-        }
     }
 
     @Override
@@ -79,6 +60,17 @@ public class AutoPinBuildServerListener extends BuildServerAdapter {
                         buildHistory.findEntry(bp.getAssociatedBuild().getBuildId()).setPinned(true, triggeringUser, comment);
                     }
                 }
+                String tag = bfd.getParameters().get(AutoPinBuildFeature.PARAM_TAG);
+
+                if (StringUtils.isSet(tag)) {
+                        BuildTagHelper.addTag(finishedBuild, tag);
+
+                        if (StringUtils.isTrue(bfd.getParameters().get(AutoPinBuildFeature.PARAM_PIN_DEPENDENCIES))) {
+                            for (BuildPromotion bp : finishedBuild.getBuildPromotion().getAllDependencies()) {
+                                BuildTagHelper.addTag(buildHistory.findEntry(bp.getAssociatedBuild().getBuildId()), tag);
+                            }
+                        }
+                    }
             }
         }
     }
@@ -97,17 +89,6 @@ public class AutoPinBuildServerListener extends BuildServerAdapter {
 
         String requestedBranchPattern = parameters.get(AutoPinBuildFeature.PARAM_BRANCH_PATTERN);
         if (requestedBranchPattern != null && !requestedBranchPattern.isEmpty() && build.getBranch() != null) {
-            matching = matching && build.getBranch().getDisplayName().matches(requestedBranchPattern);
-        }
-
-        return matching;
-    }
-
-    private boolean areTaggingConditionsMet(Map<String, String> parameters, SBuild build) {
-        boolean matching = true;
-
-        String requestedBranchPattern = parameters.get(AutoPinBuildFeature.PARAM_BRANCH_PATTERN);
-        if (requestedBranchPattern != null && !requestedBranchPattern.isEmpty()  && build.getBranch() != null) {
             matching = matching && build.getBranch().getDisplayName().matches(requestedBranchPattern);
         }
 
