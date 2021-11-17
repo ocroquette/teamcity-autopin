@@ -9,7 +9,11 @@
      <file>
          <source>target/teamcity-plugin.xml</source>
          <outputDirectory>/</outputDirectory>
-     </file> 
+     </file>
+      <file>
+          <source>../kotlin-dsl/AutoPin.xml</source>
+          <outputDirectory>/kotlin-dsl/</outputDirectory>
+      </file>
   </files>
   <moduleSets>
     <moduleSet>
