@@ -11,7 +11,7 @@ import java.util.*;
 
 public class AutoPinBuildFeature extends BuildFeature {
 
-    public static final String TYPE = AutoPinBuildFeature.class.getName();
+    public static final String TYPE = "auto-pin";
 
     public static final String PARAM_STATUS = "status_radio";
     public static final String PARAM_STATUS_SUCCESSFUL = "Successful";
