@@ -6,10 +6,6 @@ This plugin allows to pin and/or tag Teamcity builds automatically, e.g. without
 * tag the build with the version string generated in a build step
 * when a build is parameterized, add a tag automatically accordingly, to see and filter easily the builds run with a given parameter value
 
-## Warning
-
-This plugin is still in early development, it might undergo changes that are not backwards compatible.
-
 ## Installation
 
 Currently, the plugin is available only as source code. To build it, clone the repository and run:
